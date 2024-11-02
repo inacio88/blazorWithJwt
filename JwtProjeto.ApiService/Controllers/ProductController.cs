@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using JwtProjeto.Models.Models;
 namespace JwtProjeto.ApiService.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class ProductController(IProductService productService) : Controller
     {
         [HttpGet]
