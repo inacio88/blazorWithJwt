@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JwtProjeto.Models\JwtProjeto.Models.csproj" />
+    <ProjectReference Include="..\JwtProjeto.Database\JwtProjeto.Database.csproj" />
+  </ItemGroup>
+
 </Project>

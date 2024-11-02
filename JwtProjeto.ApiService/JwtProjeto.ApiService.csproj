@@ -7,12 +7,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JwtProjeto.BL\JwtProjeto.BL.csproj" />
+    <ProjectReference Include="..\JwtProjeto.Models\JwtProjeto.Models.csproj" />
     <ProjectReference Include="..\JwtProjeto.ServiceDefaults\JwtProjeto.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\api\Controllers\" />
+    <Folder Include="Areas\api\Data\" />
+    <Folder Include="Areas\api\Models\" />
+    <Folder Include="Areas\api\Views\" />
   </ItemGroup>
 
 </Project>

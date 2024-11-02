@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JwtProjeto.ServiceDefaults\JwtProjeto.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\JwtProjeto.Models\JwtProjeto.Models.csproj" />
   </ItemGroup>
 
 </Project>
