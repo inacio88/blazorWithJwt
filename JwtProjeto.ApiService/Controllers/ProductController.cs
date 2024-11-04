@@ -11,14 +11,14 @@ namespace JwtProjeto.ApiService.Controllers
         public async Task<ActionResult<BaseResponseModel>> GetProducts()
         {
             var products = await productService.GetProducts();
-            return Ok(new BaseResponseModel{Success = true, Data = products});
+            return Ok(new BaseResponseModel { Success = true, Data = products });
         }
 
         [HttpPost]
         public async Task<ActionResult<ProductModel>> CreateProduct(ProductModel productModel)
         {
             await productService.CreateProduct(productModel);
-            return Ok(new BaseResponseModel{Success = true});
+            return Ok(new BaseResponseModel { Success = true });
         }
 
         [HttpGet("{id}")]
@@ -28,10 +28,10 @@ namespace JwtProjeto.ApiService.Controllers
 
             if (productModel is null)
             {
-                return Ok(new BaseResponseModel {Success = false, ErrorMessage = "Not found"});
+                return Ok(new BaseResponseModel { Success = false, ErrorMessage = "Not found" });
             }
 
-            return Ok(new BaseResponseModel {Success = true, Data = productModel});
+            return Ok(new BaseResponseModel { Success = true, Data = productModel });
         }
 
         [HttpPut("{id}")]
@@ -39,11 +39,24 @@ namespace JwtProjeto.ApiService.Controllers
         {
             if (id != productModel.Id || !await productService.ProductModelExists(id))
             {
-                return Ok(new BaseResponseModel {Success = false, ErrorMessage = "Bad request - id incompativel"});
+                return Ok(new BaseResponseModel { Success = false, ErrorMessage = "Bad request - id incompativel" });
             }
 
             await productService.UpdateProduct(productModel);
-            return Ok(new BaseResponseModel {Success = true});
+            return Ok(new BaseResponseModel { Success = true });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            if (!await productService.ProductModelExists(id))
+            {
+                return Ok(new BaseResponseModel { Success = false, ErrorMessage = "Not found" });
+            }
+
+            await productService.DeleteProduct(id);
+
+            return Ok(new BaseResponseModel { Success = true });
         }
 
     }

@@ -13,6 +13,13 @@ public class ProductRepository(AppDbContext dbContext) : IProductRepository
         return productModel;
     }
 
+    public async Task DeleteProduct(int id)
+    {
+        var product = dbContext.Products.FirstOrDefault(x => x.Id == id);
+        dbContext.Products.Remove(product);
+        await dbContext.SaveChangesAsync();
+    }
+
     public  Task<ProductModel> GetProduct(int id)
     {
         return dbContext.Products.FirstAsync(x => x.Id == id);

@@ -10,6 +10,11 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         return productRepository.CreateProduct(productModel);
     }
 
+    public Task DeleteProduct(int id)
+    {
+        return productRepository.DeleteProduct(id);
+    }
+
     public Task<ProductModel> GetProduct(int id)
     {
         return productRepository.GetProduct(id);
