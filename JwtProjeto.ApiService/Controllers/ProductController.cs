@@ -34,7 +34,7 @@ namespace JwtProjeto.ApiService.Controllers
             return Ok(new BaseResponseModel {Success = true, Data = productModel});
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, ProductModel productModel)
         {
             if (id != productModel.Id || !await productService.ProductModelExists(id))

@@ -33,12 +33,16 @@ namespace JwtProjeto.Web.Components.Pages.Product
         public async Task Submit()
         {
 
-            var res = await ApiClient.PutAsync<BaseResponseModel, ProductModel>("/api/Product", Model);
+            var res = await ApiClient.PutAsync<BaseResponseModel, ProductModel>($"/api/Product/{ID}", Model);
 
             if (res is not null && res.Success)
             {
                 toastService.ShowSuccess("Create product successfully");
                 navigationManager.NavigateTo("/product");
+            }
+            else
+            {
+                toastService.ShowError("Deu erro");
             }
 
         }
