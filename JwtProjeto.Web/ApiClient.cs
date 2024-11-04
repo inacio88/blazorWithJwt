@@ -19,5 +19,15 @@ public class ApiClient(HttpClient httpClient)
         }
         return default;
     }
+
+    public async Task<T1> PutAsync<T1, T2>(string path, T2 putModel)
+    {
+        var res = await httpClient.PutAsJsonAsync(path, putModel);
+        if (res is not null && res.IsSuccessStatusCode)
+        {
+            return JsonConvert.DeserializeObject<T1>(await res.Content.ReadAsStringAsync());
+        }
+        return default;
+    }
 }
 

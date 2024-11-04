@@ -1,6 +1,5 @@
-@page "/product/create"
-<h3>CreateProduct</h3>
-@rendermode InteractiveServer
+@page "/product/update/{ID:int}"
+<h3>Update Product</h3>
 
 <EditForm OnValidSubmit="Submit" FormName="CreateProduct" Model="Model">
     <DataAnnotationsValidator />

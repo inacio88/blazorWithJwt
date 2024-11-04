@@ -14,7 +14,7 @@ namespace JwtProjeto.Web.Components.Pages.Product
             var res = await ApiClient.GetFromJsonAsync<BaseResponseModel>("/api/Product");
             if (res is not null && res.Success)
             {
-                ProductModels = JsonConvert.DeserializeObject<List<ProductModel>>(res.Data.ToString());
+                ProductModels = JsonConvert.DeserializeObject<List<ProductModel>>(res.Data.ToString());             
             }
 
             await base.OnInitializedAsync();

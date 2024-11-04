@@ -1,3 +1,4 @@
+using Blazored.Toast;
 using JwtProjeto.Web;
 using JwtProjeto.Web.Components;
 
@@ -11,6 +12,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddOutputCache();
+builder.Services.AddBlazoredToast();
 
 builder.Services.AddHttpClient<ApiClient>(client =>
     {
