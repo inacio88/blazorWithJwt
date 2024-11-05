@@ -1,17 +1,30 @@
 using System.Text.Json;
+using JwtProjeto.Models.Models;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Newtonsoft.Json;
 
 namespace JwtProjeto.Web;
 
-public class ApiClient(HttpClient httpClient)
+public class ApiClient(HttpClient httpClient, ProtectedLocalStorage protectedLocalStorage)
 {
-    public Task<T> GetFromJsonAsync<T>(string path)
+    public async Task SetAuthorizeHeader()
     {
-        return httpClient.GetFromJsonAsync<T>(path);
+        var token = (await protectedLocalStorage.GetAsync<LoginResponseModel>("sessionState")).Value;
+        if (token is not null)
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Token);
+        }
+    }
+    public async Task<T> GetFromJsonAsync<T>(string path)
+    {
+        await SetAuthorizeHeader();
+        return await httpClient.GetFromJsonAsync<T>(path);
     }
 
     public async Task<T1> PostAsync<T1, T2>(string path, T2 postModel)
     {
+        await SetAuthorizeHeader();
+
         var res = await httpClient.PostAsJsonAsync(path, postModel);
         if (res is not null && res.IsSuccessStatusCode)
         {
@@ -22,6 +35,8 @@ public class ApiClient(HttpClient httpClient)
 
     public async Task<T1> PutAsync<T1, T2>(string path, T2 putModel)
     {
+        await SetAuthorizeHeader();
+
         var res = await httpClient.PutAsJsonAsync(path, putModel);
         if (res is not null && res.IsSuccessStatusCode)
         {
@@ -30,9 +45,11 @@ public class ApiClient(HttpClient httpClient)
         return default;
     }
 
-    public Task<T> DeleteAsync<T>(string path)
+    public async Task<T> DeleteAsync<T>(string path)
     {
-        return httpClient.DeleteFromJsonAsync<T>(path);
+        await SetAuthorizeHeader();
+
+        return await httpClient.DeleteFromJsonAsync<T>(path);
     }
 }
 
