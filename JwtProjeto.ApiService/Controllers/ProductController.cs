@@ -1,8 +1,10 @@
 using JwtProjeto.BL.Services;
 using Microsoft.AspNetCore.Mvc;
 using JwtProjeto.Models.Models;
+using Microsoft.AspNetCore.Authorization;
 namespace JwtProjeto.ApiService.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController(IProductService productService) : Controller
