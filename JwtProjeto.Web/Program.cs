@@ -1,6 +1,8 @@
 using Blazored.Toast;
 using JwtProjeto.Web;
+using JwtProjeto.Web.Authentication;
 using JwtProjeto.Web.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,7 @@ builder.Services.AddOutputCache();
 builder.Services.AddAuthentication();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddBlazoredToast();
-
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddHttpClient<ApiClient>(client =>
     {
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.

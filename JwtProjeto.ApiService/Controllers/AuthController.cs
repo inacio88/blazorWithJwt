@@ -12,7 +12,7 @@ namespace JwtProjeto.ApiService.Controllers
     [Route("api/[controller]")]
     public class AuthController(IConfiguration configuration) : ControllerBase
     {
-        [HttpPost]
+        [HttpPost("login")]
         public ActionResult<LoginResponseModel> Login(LoginModel login)
         {
             if (login.UserName == "Admin" && login.Password == "Admin")
