@@ -1,5 +1,7 @@
-@page "/product"
 @using System.Diagnostics
+@using Microsoft.AspNetCore.Authorization
+@page "/product"
+@attribute [Authorize(Roles = "Admin, User")]
 <h3>IndexProduct</h3>
 
 @if (ProductModels is null)
@@ -31,7 +33,11 @@ else
                         <td>@product.CreatedAt</td>
                         <td>
                             <a class="btn btn-secondary" href="/product/update/@product.Id">Update</a>
-                            <button class="btn btn-danger" @onclick="() => {DeleteId = product.Id; appModal.Open();}">Delete</button>
+                            <AuthorizeView Roles="Admin">
+                                <Authorized>
+                                    <button class="btn btn-danger" @onclick="() => {DeleteId = product.Id; appModal.Open();}">Delete</button>
+                                </Authorized>
+                            </AuthorizeView>
                         </td>
                     </tr>
                 }

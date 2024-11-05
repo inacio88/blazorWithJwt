@@ -15,7 +15,8 @@ namespace JwtProjeto.ApiService.Controllers
         [HttpPost("login")]
         public ActionResult<LoginResponseModel> Login(LoginModel login)
         {
-            if (login.UserName == "Admin" && login.Password == "Admin")
+            if (login.UserName == "Admin" && login.Password == "Admin" ||
+                login.UserName == "User" && login.Password == "User")
             {
                 var token = GenerateJwtToken(login.UserName);
                 return Ok(new LoginResponseModel{Token = token});
@@ -28,7 +29,7 @@ namespace JwtProjeto.ApiService.Controllers
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, userName),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.Role, userName == "Admin" ? "Admin" : "User")
             };
 
             string secret = configuration.GetValue<string>("Jwt:Secret");
