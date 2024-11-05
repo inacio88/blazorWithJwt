@@ -8,14 +8,17 @@ namespace JwtProjeto.Web.Authentication
 {
     public class CustomAuthStateProvider(ProtectedLocalStorage protectedLocalStorage) : AuthenticationStateProvider
     {
-        public override Task<AuthenticationState> GetAuthenticationStateAsync()
+        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            throw new NotImplementedException();
+            var sessionModel = (await protectedLocalStorage.GetAsync<LoginResponseModel>("sessionState")).Value;
+            var identity = sessionModel == null ? new ClaimsIdentity() : GetClaimsIdentity(sessionModel.Token);
+            var user = new ClaimsPrincipal(identity);
+            return new AuthenticationState(user);
         }
 
         public async Task MarkUserAsAuthenticated(LoginResponseModel model)
         {
-            await protectedLocalStorage.SetAsync("authToken", model);
+            await protectedLocalStorage.SetAsync("sessionState", model);
             var identity = GetClaimsIdentity(model.Token);
             var user = new ClaimsPrincipal(identity);
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
