@@ -12,6 +12,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddOutputCache();
+builder.Services.AddAuthentication();
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddBlazoredToast();
 
 builder.Services.AddHttpClient<ApiClient>(client =>
@@ -35,7 +37,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
-
+app.UseAuthorization();
+app.UseAuthentication();
 app.UseOutputCache();
 
 app.MapRazorComponents<App>()
