@@ -1,0 +1,14 @@
+@page "/logout"
+@using JwtProjeto.Web.Authentication
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+        navigationManager.NavigateTo("/login");
+    }
+}
