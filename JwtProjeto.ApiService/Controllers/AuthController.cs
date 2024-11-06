@@ -4,35 +4,74 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Identity.Client;
+using JwtProjeto.BL.Services;
+using JwtProjeto.Models.Entities;
 
 namespace JwtProjeto.ApiService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IConfiguration configuration) : ControllerBase
+    public class AuthController(IConfiguration configuration, IAuthService authService) : ControllerBase
     {
         [HttpPost("login")]
-        public ActionResult<LoginResponseModel> Login(LoginModel login)
+        public async Task<ActionResult<LoginResponseModel>> Login(LoginModel login)
         {
-            if (login.UserName == "Admin" && login.Password == "Admin" ||
-                login.UserName == "User" && login.Password == "User")
+            var user = await authService.GetUserByLogin(login.UserName, login.Password);
+            if (user is not null)
             {
-                var token = GenerateJwtToken(login.UserName);
-                return Ok(new LoginResponseModel{Token = token});
+                var token = GenerateJwtToken(user, isRefreshToken: false);
+                var refreshToken = GenerateJwtToken(user, isRefreshToken: true);
+
+                await authService.AddRefreshTokenModel(new RefreshTokenModel
+                {
+                    RefreshToken = refreshToken,
+                    UserId = user.Id
+                });
+
+                return Ok(new LoginResponseModel
+                {
+                    Token = token,
+                    RefreshToken = refreshToken,
+                    TokenExpired = DateTimeOffset.UtcNow.AddMinutes(8).ToUnixTimeSeconds()
+                });
             }
             return null;
         }
 
-        private string GenerateJwtToken(string userName)
+        [HttpGet("loginByRefreshToken")]
+        public async Task<ActionResult<LoginResponseModel>> LoginByRefreshToken(string refreshToken)
         {
-            var claims = new[]
+            var refreshTokenModel = await authService.GetRefreshTokenModel(refreshToken);
+            if (refreshTokenModel is null)
             {
-                new Claim(ClaimTypes.Name, userName),
-                new Claim(ClaimTypes.Role, userName == "Admin" ? "Admin" : "User")
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+
+            var newToken = GenerateJwtToken(refreshTokenModel.User, isRefreshToken: false);
+            var newRefreshToken = GenerateJwtToken(refreshTokenModel.User, isRefreshToken: true);
+
+            await authService.AddRefreshTokenModel(new RefreshTokenModel{
+                RefreshToken = newRefreshToken,
+                UserId = refreshTokenModel.UserId
+            });
+
+            return new LoginResponseModel
+            {
+                Token = newToken,
+                TokenExpired = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds(),
+                RefreshToken = newRefreshToken
             };
 
-            string secret = configuration.GetValue<string>("Jwt:Secret");
+        }
+
+        private string GenerateJwtToken(UserModel user, bool isRefreshToken)
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+            };
+            claims.AddRange(user.UserRoles.Select(n => new Claim(ClaimTypes.Name, n.Role.RoleName)));
+            string secret = configuration.GetValue<string>($"Jwt:{(isRefreshToken ? "RefreshToken" : "Secret")}");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -40,7 +79,7 @@ namespace JwtProjeto.ApiService.Controllers
                 issuer: "inacio",
                 audience: "inacio",
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(isRefreshToken ? 24 * 60 : 9),
                 signingCredentials: creds
             );
 

@@ -1,18 +1,42 @@
+using System.Net.Http.Headers;
 using System.Text.Json;
 using JwtProjeto.Models.Models;
+using JwtProjeto.Web.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Newtonsoft.Json;
 
 namespace JwtProjeto.Web;
 
-public class ApiClient(HttpClient httpClient, ProtectedLocalStorage protectedLocalStorage)
+public class ApiClient(HttpClient httpClient, ProtectedLocalStorage protectedLocalStorage, AuthenticationStateProvider authenticationStateProvider)
 {
     public async Task SetAuthorizeHeader()
     {
-        var token = (await protectedLocalStorage.GetAsync<LoginResponseModel>("sessionState")).Value;
-        if (token is not null)
+        var sessionState = (await protectedLocalStorage.GetAsync<LoginResponseModel>("sessionState")).Value;
+        if (sessionState is not null && !string.IsNullOrEmpty(sessionState.Token))
         {
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Token);
+            if (sessionState.TokenExpired < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+            }
+            else if (sessionState.TokenExpired < DateTimeOffset.UtcNow.AddMinutes(10).ToUnixTimeSeconds())
+            {
+                var res = await httpClient.GetFromJsonAsync<LoginResponseModel>($"/api/auth/loginByRefreshToken?refreshToken={sessionState.RefreshToken}");
+                if (res is not null)
+                {
+                    await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(res);
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", res.Token);
+                }
+                else
+                {
+                    await ((CustomAuthStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+                }
+            }
+            else
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessionState.Token);
+            }
+
         }
     }
     public async Task<T> GetFromJsonAsync<T>(string path)
