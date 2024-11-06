@@ -70,7 +70,7 @@ namespace JwtProjeto.ApiService.Controllers
             {
                 new Claim(ClaimTypes.Name, user.Username),
             };
-            claims.AddRange(user.UserRoles.Select(n => new Claim(ClaimTypes.Name, n.Role.RoleName)));
+            claims.AddRange(user.UserRoles.Select(n => new Claim(ClaimTypes.Role, n.Role.RoleName)));
             string secret = configuration.GetValue<string>($"Jwt:{(isRefreshToken ? "RefreshToken" : "Secret")}");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

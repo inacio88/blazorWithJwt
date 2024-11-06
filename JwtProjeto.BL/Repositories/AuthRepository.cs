@@ -19,7 +19,7 @@ namespace JwtProjeto.BL.Repositories
 
         public Task<UserModel> GetUserByLogin(string userName, string password)
         {
-            return appDbContext.Users.Include(n => n.UserRoles).ThenInclude(n => n.Role).FirstOrDefaultAsync(x => x.Username == userName && x.Password == password);
+            return appDbContext.Users.Include(n => n.UserRoles).ThenInclude(n => n.Role).FirstOrDefaultAsync(n => n.Username == userName && n.Password == password);
         }
 
         public async Task RemoveRefreshTokenByUserId(int userId)
